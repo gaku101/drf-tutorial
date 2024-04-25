@@ -5,6 +5,8 @@ from .models import Post
 from .serializers import PostSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 def helloWorld(request):
@@ -35,10 +37,15 @@ def createPost(request):
 
 @api_view(['GET'])
 def getPostById(request, pk):
-  post = Post.objects.get(id=pk)
 
-  serializer = PostSerializer(post, many=False)
-  return Response(serializer.data)
+  post = get_object_or_404(Post, id=pk)
+
+  try:
+    # post = Post.objects.get(id=pk)
+    serializer = PostSerializer(post, many=False)
+    return Response(serializer.data)
+  except:
+    return Response({"error": "Something went wrong..."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['DELETE'])
 def deletePost(request, pk):
